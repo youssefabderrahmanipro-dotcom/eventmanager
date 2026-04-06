@@ -1,2 +1,1 @@
-# eventmanager
-# gestion-stock-spring
+# event-manager
