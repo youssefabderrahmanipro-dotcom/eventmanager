@@ -1,8 +1,10 @@
 package com.eventmanager.service;
 
 import com.eventmanager.dto.PrestationDTO;
+import com.eventmanager.entity.Categorie;
 import com.eventmanager.entity.Prestation;
 import com.eventmanager.entity.Utilisateur;
+import com.eventmanager.repository.CategorieRepository;
 import com.eventmanager.repository.PrestationRepository;
 import com.eventmanager.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,13 @@ public class PrestationService {
     private final PrestationRepository repo;
     private final UtilisateurRepository uRepo;
     private final MapperService mapper;
+    private final CategorieRepository categorieRepo;
 
-    public PrestationService(PrestationRepository r, UtilisateurRepository u, MapperService m) {
+    public PrestationService(PrestationRepository r, UtilisateurRepository u, MapperService m, CategorieRepository categorieRepo) {
         repo = r;
         uRepo = u;
         mapper = m;
+        this.categorieRepo = categorieRepo;
     }
 
     public List<PrestationDTO> findAll(String email) {
@@ -39,18 +43,31 @@ public class PrestationService {
     }
 
     public PrestationDTO create(PrestationDTO dto, String email) {
+
         Utilisateur u = uRepo.findByEmail(email).orElseThrow();
-        Prestation p = mapper.fromDto(dto, u); // mapper doit créer la prestation avec propriétaire
+
+        Categorie cat = categorieRepo.findById(dto.getCategorieId())
+                .orElseThrow(() -> new RuntimeException("Catégorie introuvable"));
+
+        Prestation p = mapper.fromDto(dto, u, cat);
+
         return mapper.toDto(repo.save(p));
     }
-
     public PrestationDTO update(Long id, PrestationDTO dto) {
         Prestation p = repo.findById(id).orElseThrow();
+
         p.setNom(dto.getNom());
         p.setDescription(dto.getDescription());
         p.setPrix(dto.getPrix());
-        p.setCategorie(dto.getCategorie());
+
+        if (dto.getCategorieId() != null) {
+            Categorie cat = categorieRepo.findById(dto.getCategorieId())
+                    .orElseThrow(() -> new RuntimeException("Catégorie introuvable"));
+            p.setCategorie(cat);
+        }
+
         p.setStatut(dto.getStatut());
+
         return mapper.toDto(repo.save(p));
     }
 

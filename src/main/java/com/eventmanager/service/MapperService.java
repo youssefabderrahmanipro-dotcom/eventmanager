@@ -76,20 +76,29 @@ public class MapperService {
         d.setNom(s.getNom());
         d.setDescription(s.getDescription());
         d.setPrix(s.getPrix());
-        d.setCategorie(s.getCategorie());
         d.setStatut(s.getStatut());
+        // ✅ catégorie propre
+        if (s.getCategorie() != null) {
+            d.setCategorieId(s.getCategorie().getId());
+            d.setCategorieNom(s.getCategorie().getName());
+        }
         d.setProprietaireId(s.getProprietaire() != null ? String.valueOf(s.getProprietaire().getId()) : "");
         return d;
     }
 
-    public Prestation fromDto(PrestationDTO d, Utilisateur proprietaire) {
+    public Prestation fromDto(PrestationDTO d, Utilisateur proprietaire, Categorie categorie) {
         Prestation s = new Prestation();
+
         s.setNom(d.getNom());
         s.setDescription(d.getDescription());
         s.setPrix(d.getPrix());
-        s.setCategorie(d.getCategorie());
+
+        // ✅ relation correcte JPA
+        s.setCategorie(categorie);
+
         s.setStatut(d.getStatut() != null ? d.getStatut() : "actif");
         s.setProprietaire(proprietaire);
+
         return s;
     }
 
