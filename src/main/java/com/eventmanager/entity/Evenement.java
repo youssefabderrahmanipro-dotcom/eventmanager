@@ -37,7 +37,6 @@ public class Evenement {
     private String ville;
     private String codePostale;
 
-    private Double budget;
 
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")

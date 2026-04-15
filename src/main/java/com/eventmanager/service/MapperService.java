@@ -40,7 +40,6 @@ public class MapperService {
         d.setAdresse(e.getAdresse());
         d.setVille(e.getVille());
         d.setCodePostale(e.getCodePostale());
-        d.setBudget(e.getBudget());
         d.setPrestationIds(new ArrayList<>());
         return d;
     }
@@ -63,7 +62,6 @@ public class MapperService {
         e.setVille(d.getVille());
         e.setCodePostale(d.getCodePostale());
 
-        e.setBudget(d.getBudget());
         e.setProprietaire(proprietaire);
 
         return e;

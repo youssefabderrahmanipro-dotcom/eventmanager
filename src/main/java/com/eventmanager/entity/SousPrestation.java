@@ -3,11 +3,9 @@ package com.eventmanager.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Entity
-public class Societe {
+public class SousPrestation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,11 +13,9 @@ public class Societe {
 
     private String nom;
 
-    @Column(unique = true)
-    private String email;
+    private Double prix;
 
-    private String telephone;
-
-    @OneToMany(mappedBy = "societe")
-    private List<Utilisateur> utilisateurs;
+    @ManyToOne
+    @JoinColumn(name = "prestation_id")
+    private Prestation prestation;
 }

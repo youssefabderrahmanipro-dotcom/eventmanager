@@ -33,21 +33,25 @@ public class UtilisateurService {
         return u.getPrestataires().stream().map(p -> mapper.toPrestataire(p, String.valueOf(u.getId()))).collect(Collectors.toList());
     }
 
-    public PrestataireDTO addProvider(String email, PrestataireDTO dto) {
+    public PrestataireDTO addProvider(String email, Long providerId) {
         Utilisateur company = findByEmail(email);
 
-        Utilisateur provider = new Utilisateur();
-        provider.setNom(dto.getNom());
-        provider.setRole("provider");
-        provider.setEmail(dto.getEmail());
-        provider.setMotDePasse(dto.getMotDePasse());
-        uRepo.save(provider);
+        // ✅ récupérer prestataire existant
+        Utilisateur provider = uRepo.findById(providerId)
+                .orElseThrow(() -> new RuntimeException("Prestataire non trouvé"));
 
-        company.getPrestataires().add(provider);
-        uRepo.save(company);
+        // ✅ sécurité : vérifier role
+        if (!"provider".equals(provider.getRole())) {
+            throw new RuntimeException("Cet utilisateur n'est pas un prestataire");
+        }
 
-        dto.setId(String.valueOf(provider.getId()));
-        return dto;
+        // ✅ éviter doublons
+        if (!company.getPrestataires().contains(provider)) {
+            company.getPrestataires().add(provider);
+            uRepo.save(company);
+        }
+
+        return mapper.toPrestataire(provider, String.valueOf(company.getId()));
     }
 
     public void removeProvider(String email, Long providerId) {
@@ -66,4 +70,12 @@ public class UtilisateurService {
         if ("provider".equals(u.getRole())) s.setTotalPrestations(sRepo.findByProprietaireId(u.getId()).size());
         return s;
     }
+
+    public List<PrestataireDTO> getAllProviders() {
+        return uRepo.findByRole("provider")
+                .stream()
+                .map(u -> mapper.toPrestataire(u, null))
+                .collect(Collectors.toList());
+    }
+
 }

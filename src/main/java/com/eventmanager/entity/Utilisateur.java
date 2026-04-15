@@ -42,4 +42,7 @@ public class Utilisateur {
     @ManyToOne
     @JoinColumn(name = "societe_id")
     private Societe societe;
+    @ManyToOne
+    @JoinColumn(name = "prestataire_id")
+    private Prestataire prestataire;
 }

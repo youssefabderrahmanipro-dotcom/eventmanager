@@ -50,7 +50,6 @@ public class EvennementService {
         e.setAdresse(dto.getAdresse());
         e.setVille(dto.getVille());
         e.setCodePostale(dto.getCodePostale());
-        e.setBudget(dto.getBudget());
         return mapper.toDto(repo.save(e));
     }
 

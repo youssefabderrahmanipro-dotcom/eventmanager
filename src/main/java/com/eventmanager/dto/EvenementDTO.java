@@ -31,7 +31,6 @@ public class EvenementDTO {
     private String ville;
     private String codePostale;
 
-    private Double budget;
 
     private List<String> prestationIds;
 }

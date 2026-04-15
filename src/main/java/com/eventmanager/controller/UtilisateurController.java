@@ -27,7 +27,7 @@ public class UtilisateurController {
                         String.valueOf(u.getId()),
                         u.getNom(),
                         u.getEmail(),
-                        u.getTelephone(), // ✅ IMPORTANT
+                        u.getTelephone(),
                         u.getRole()
                 )
         );
@@ -43,9 +43,12 @@ public class UtilisateurController {
         return ResponseEntity.ok(s.getProviders(a.getName()));
     }
 
-    @PostMapping("/providers")
-    public ResponseEntity<PrestataireDTO> addProvider(@RequestBody PrestataireDTO dto, Authentication a) {
-        PrestataireDTO saved = s.addProvider(a.getName(), dto); // passe dto complet
+    @PostMapping("/providers/{providerId}")
+    public ResponseEntity<PrestataireDTO> addProvider(
+            @PathVariable Long providerId,
+            Authentication a) {
+
+        PrestataireDTO saved = s.addProvider(a.getName(), providerId);
         return ResponseEntity.ok(saved);
     }
 
@@ -53,5 +56,10 @@ public class UtilisateurController {
     public ResponseEntity<Void> removeProvider(@PathVariable Long id, Authentication a) {
         s.removeProvider(a.getName(), id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/all-providers")
+    public ResponseEntity<List<PrestataireDTO>> getAllProviders() {
+        return ResponseEntity.ok(s.getAllProviders());
     }
 }
