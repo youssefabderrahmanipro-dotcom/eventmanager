@@ -10,25 +10,18 @@ import java.util.List;
 @Entity
 @Table(name = "evenements")
 public class Evenement {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String titre;
-
     private String type;
-
     private String date;
-
     private String dateFin;
-
     private String lieu;
-
     private String description;
 
     private String statut;
-
     private String nomClient;
     private String prenom;
     private String email;

@@ -54,7 +54,7 @@ public class CategorieService {
 
         categorie.setName(dto.getName());
         categorie.setDescription(dto.getDescription());
-        categorie.setProprietaireId(dto.getProprietaireId());
+       // categorie.setProprietaireId(dto.getProprietaireId());
 
         return mapToDTO(repository.save(categorie));
     }
