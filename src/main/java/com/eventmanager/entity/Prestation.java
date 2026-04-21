@@ -18,7 +18,6 @@ public class Prestation {
     private String nom;
     private String description;
     private Double prix;
-    //private String categorie;
     private String statut;
 
     @ManyToOne
@@ -36,4 +35,7 @@ public class Prestation {
     @ManyToOne
     @JoinColumn(name = "categorie_id")
     private Categorie categorie;
+
+    @OneToMany(mappedBy = "prestation")
+    private List<SousService> sousServices;
 }

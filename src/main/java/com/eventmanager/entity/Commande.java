@@ -50,4 +50,12 @@ public class Commande {
             inverseJoinColumns = @JoinColumn(name = "pack_id")
     )
     private List<Pack> packs;
+
+    @ManyToMany
+    @JoinTable(
+            name = "commande_sous_services",
+            joinColumns = @JoinColumn(name = "commande_id"),
+            inverseJoinColumns = @JoinColumn(name = "sous_service_id")
+    )
+    private List<SousService> sousServices;
 }

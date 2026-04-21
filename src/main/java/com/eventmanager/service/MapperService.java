@@ -99,6 +99,28 @@ public class MapperService {
 
         return s;
     }
+    // --------------------- SOUS SERVICE ---------------------
+
+    public SousServiceDTO toDto(SousService s) {
+        SousServiceDTO d = new SousServiceDTO();
+        d.setId(String.valueOf(s.getId()));
+        d.setNom(s.getNom());
+        d.setDescription(s.getDescription());
+        d.setPrix(s.getPrix());
+        d.setPrestationId(
+                s.getPrestation() != null ? String.valueOf(s.getPrestation().getId()) : null
+        );
+        return d;
+    }
+
+    public SousService fromDto(SousServiceDTO d, Prestation prestation) {
+        SousService s = new SousService();
+        s.setNom(d.getNom());
+        s.setDescription(d.getDescription());
+        s.setPrix(d.getPrix());
+        s.setPrestation(prestation);
+        return s;
+    }
 
     // --------------------- PACK ---------------------
     public PackDTO toDto(Pack p) {
