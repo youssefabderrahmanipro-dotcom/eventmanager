@@ -1,6 +1,7 @@
 package com.eventmanager.service;
 
 import com.eventmanager.dto.CommandeDTO;
+import com.eventmanager.dto.CommandePrestationDTO;
 import com.eventmanager.entity.*;
 import com.eventmanager.repository.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class CommandeService {
     private final PrestationRepository prestationRepo;
     private final PackRepository packRepo;
     private final MapperService mapper;
+    private final CommandePrestationRepository commandePrestationRepository;
 
     public CommandeService(
             CommandeRepository r,
@@ -25,7 +27,7 @@ public class CommandeService {
             EvenementRepository e,
             PrestationRepository p,
             PackRepository packR,
-            MapperService m
+            MapperService m, CommandePrestationRepository commandePrestationRepository
     ) {
         repo = r;
         uRepo = u;
@@ -33,6 +35,7 @@ public class CommandeService {
         prestationRepo = p;
         packRepo = packR;
         mapper = m;
+        this.commandePrestationRepository = commandePrestationRepository;
     }
 
     public List<CommandeDTO> findAll(String email) {
@@ -114,7 +117,7 @@ public class CommandeService {
                     eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null)
             );
         }
-
+        /*******************************************************************************/
         if (dto.getPrestationIds() != null) {
             List<Prestation> prestations = prestationRepo.findAllById(
                     dto.getPrestationIds().stream()
@@ -122,6 +125,21 @@ public class CommandeService {
                             .collect(Collectors.toList())
             );
             o.setPrestations(prestations);
+            if (dto.getPrestationsWithQuantite() != null && !dto.getPrestationsWithQuantite().isEmpty()) {
+
+                for (CommandePrestationDTO p : dto.getPrestationsWithQuantite()) {
+
+                    CommandePrestation cp = new CommandePrestation();
+
+                    cp.setCommandeId(o.getId());;
+
+                    cp.setPrestationId(Long.valueOf(p.getPrestationId()));
+
+                    cp.setQuantite(p.getQuantite());
+
+                    commandePrestationRepository.save(cp);
+                }
+            }
         }
 
         if (dto.getPackIds() != null) {

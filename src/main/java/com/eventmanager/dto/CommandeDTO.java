@@ -30,4 +30,6 @@ public class CommandeDTO {
     private String dateCreation;
 
     private String notes;
+    private List<Long> sousServiceIds;
+    private List<CommandePrestationDTO> prestationsWithQuantite;
 }

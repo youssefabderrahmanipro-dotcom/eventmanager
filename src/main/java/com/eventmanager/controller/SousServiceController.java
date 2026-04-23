@@ -18,8 +18,13 @@ public class SousServiceController {
     public SousServiceDTO create(@RequestBody SousServiceDTO dto) {
         return service.create(dto);
     }
-
+    // récupérer tout
     @GetMapping
+    public List<SousServiceDTO> getAll() {
+        return service.getAll();
+    }
+
+    @GetMapping("/prestation/{id}")
     public List<SousServiceDTO> getByPrestation(@PathVariable Long id) {
         return service.getByPrestation(id);
     }

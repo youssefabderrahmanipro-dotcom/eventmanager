@@ -37,4 +37,11 @@ public class SousServiceService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+
+    public List<SousServiceDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

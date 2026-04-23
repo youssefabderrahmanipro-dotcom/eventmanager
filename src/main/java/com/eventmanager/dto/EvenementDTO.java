@@ -1,5 +1,6 @@
 package com.eventmanager.dto;
 
+import com.eventmanager.entity.ClientType;
 import lombok.Data;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class EvenementDTO {
     private String adresse;
     private String ville;
     private String codePostale;
+    private ClientType clientType;
 
 
     private List<String> prestationIds;

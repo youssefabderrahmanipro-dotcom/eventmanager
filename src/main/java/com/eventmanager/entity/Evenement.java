@@ -29,7 +29,8 @@ public class Evenement {
     private String adresse;
     private String ville;
     private String codePostale;
-
+    @Enumerated(EnumType.STRING)
+    private ClientType clientType;
 
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
