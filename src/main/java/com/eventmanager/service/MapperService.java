@@ -2,10 +2,14 @@ package com.eventmanager.service;
 
 import com.eventmanager.dto.*;
 import com.eventmanager.entity.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+
 
 @Service
 public class MapperService {
@@ -173,6 +177,46 @@ public class MapperService {
                         o.getPacks().stream().map(p -> String.valueOf(p.getId())).collect(Collectors.toList()) :
                         new ArrayList<>()
         );
+
+        // ← Retourner sousServiceIds
+        d.setSousServiceIds(
+                o.getSousServices() != null ?
+                        o.getSousServices().stream().map(ss -> ss.getId()).collect(Collectors.toList()) :
+                        new ArrayList<>()
+        );
+
+        // ← Retourner pricingType
+        if (o.getPricingType() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> pricingMap = objectMapper.readValue(o.getPricingType(), Map.class);
+                d.setPricingType(pricingMap);
+            } catch (Exception e) {
+                d.setPricingType(new HashMap<>());
+            }
+        }
+        if (o.getQuantities() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Integer> quantitiesMap = objectMapper.readValue(o.getQuantities(), Map.class);
+                d.setQuantities(quantitiesMap);
+            } catch (Exception e) {
+                d.setQuantities(new HashMap<>());
+            }
+        }
+        d.setPrestataireId(
+                o.getPrestataire() != null ? String.valueOf(o.getPrestataire().getId()) : null
+        );
+        if (o.getPrestataireIds() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<String> ids = objectMapper.readValue(o.getPrestataireIds(), List.class);
+                d.setPrestataireIds(ids);
+            } catch (Exception e) {
+                d.setPrestataireIds(new ArrayList<>());
+            }
+        }
+
         return d;
     }
 

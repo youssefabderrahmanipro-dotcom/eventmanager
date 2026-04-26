@@ -74,4 +74,24 @@ public class PrestationService {
     public void delete(Long id) {
         repo.deleteById(id);
     }
+
+    public List<PrestationDTO> findByProvider(Long providerId, String emailDemandeur) {
+        Utilisateur demandeur = uRepo.findByEmail(emailDemandeur).orElseThrow();
+
+        // Vérifier que le prestataire est bien dans les relations du demandeur
+        boolean isRelated = demandeur.getPrestataires()
+                .stream()
+                .anyMatch(p -> p.getId().equals(providerId));
+
+        if (!isRelated) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Accès refusé"
+            );
+        }
+
+        return repo.findByProprietaireId(providerId)
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

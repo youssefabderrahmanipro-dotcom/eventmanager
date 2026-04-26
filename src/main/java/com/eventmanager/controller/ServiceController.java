@@ -45,4 +45,10 @@ public class ServiceController {
         s.delete(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/provider/{providerId}")
+    public ResponseEntity<List<PrestationDTO>> getByProvider(
+            @PathVariable Long providerId,
+            Authentication a) {
+        return ResponseEntity.ok(s.findByProvider(providerId, a.getName()));
+    }
 }

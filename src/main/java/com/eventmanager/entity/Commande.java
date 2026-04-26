@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
-
 @Data
 @Entity
 @Table(name = "commandes")
@@ -15,16 +14,24 @@ public class Commande {
     private Long id;
 
     private String titre;
-
     private String nomClient;
-
     private String statut;
-
     private Double prixTotal;
-
     private String notes;
-
     private String dateCreation;
+
+    @ManyToOne
+    @JoinColumn(name = "prestataire_id")
+    private Utilisateur prestataire;
+
+    @Column(columnDefinition = "TEXT")
+    private String prestataireIds; // ← stocker en JSON string ex: ["1","2"]
+
+    @Column(columnDefinition = "TEXT")
+    private String pricingType; // ← stocker en JSON string ex: {"1":"forfait","2":"unite"}
+
+    @Column(columnDefinition = "TEXT")
+    private String quantities;  // ← stocker en JSON string
 
     @ManyToOne
     @JoinColumn(name = "evenement_id")
@@ -34,28 +41,21 @@ public class Commande {
     @JoinColumn(name = "proprietaire_id")
     private Utilisateur proprietaire;
 
-
     @ManyToMany
-    @JoinTable(
-            name = "commande_prestations",
+    @JoinTable(name = "commande_prestations",
             joinColumns = @JoinColumn(name = "commande_id"),
-            inverseJoinColumns = @JoinColumn(name = "prestation_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "prestation_id"))
     private List<Prestation> prestations;
 
     @ManyToMany
-    @JoinTable(
-            name = "commande_packs",
+    @JoinTable(name = "commande_packs",
             joinColumns = @JoinColumn(name = "commande_id"),
-            inverseJoinColumns = @JoinColumn(name = "pack_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "pack_id"))
     private List<Pack> packs;
 
     @ManyToMany
-    @JoinTable(
-            name = "commande_sous_services",
+    @JoinTable(name = "commande_sous_services",
             joinColumns = @JoinColumn(name = "commande_id"),
-            inverseJoinColumns = @JoinColumn(name = "sous_service_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "sous_service_id"))
     private List<SousService> sousServices;
 }
