@@ -24,7 +24,6 @@ public class EventController {
 
     @PostMapping
     public EvenementDTO create(@RequestBody EvenementDTO d, Authentication a) {
-        System.out.println(d.getAdresse());
         return s.create(d, a.getName());
     }
 

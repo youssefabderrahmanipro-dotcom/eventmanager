@@ -2,6 +2,7 @@ package com.eventmanager.service;
 
 import com.eventmanager.dto.*;
 import com.eventmanager.entity.*;
+import com.eventmanager.repository.TypeEvenementRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,11 @@ import java.util.HashMap;
 
 @Service
 public class MapperService {
+    private final TypeEvenementRepository typeEvenementRepo; // ← ajouter
+
+    public MapperService(TypeEvenementRepository typeEvenementRepo) {
+        this.typeEvenementRepo = typeEvenementRepo;
+    }
 
     // --------------------- AUTH ---------------------
     public ReponseAuthentification toAuth(String token, Utilisateur u) {
@@ -31,21 +37,20 @@ public class MapperService {
         EvenementDTO d = new EvenementDTO();
         d.setId(String.valueOf(e.getId()));
         d.setTitre(e.getTitre());
-        d.setType(e.getType());
         d.setDate(e.getDate());
         d.setLieu(e.getLieu());
-        d.setDescription(e.getDescription());
         d.setProprietaireId(e.getProprietaire() != null ? String.valueOf(e.getProprietaire().getId()) : "");
         d.setStatut(e.getStatut());
         d.setNomClient(e.getNomClient());
         d.setPrenom(e.getPrenom());
-        d.setEmail(e.getEmail());
-        d.setTelephone(e.getTelephone());
-        d.setAdresse(e.getAdresse());
-        d.setVille(e.getVille());
-        d.setCodePostale(e.getCodePostale());
         d.setPrestationIds(new ArrayList<>());
         d.setClientType(e.getClientType());
+        d.setTypeEvenementId(
+                e.getTypeEvenement() != null ? e.getTypeEvenement().getId() : null
+        );
+        d.setTypeEvenementLibelle(
+                e.getTypeEvenement() != null ? e.getTypeEvenement().getLibelle() : null
+        );
         return d;
     }
 
@@ -53,22 +58,20 @@ public class MapperService {
         Evenement e = new Evenement();
 
         e.setTitre(d.getTitre());
-        e.setType(d.getType());
         e.setDate(d.getDate());
         e.setLieu(d.getLieu());
-        e.setDescription(d.getDescription());
         e.setStatut(d.getStatut() != null ? d.getStatut() : "à venir");
 
         e.setNomClient(d.getNomClient());
         e.setPrenom(d.getPrenom());
-        e.setEmail(d.getEmail());
-        e.setTelephone(d.getTelephone());
-        e.setAdresse(d.getAdresse());
-        e.setVille(d.getVille());
-        e.setCodePostale(d.getCodePostale());
         e.setClientType(d.getClientType());
         e.setProprietaire(proprietaire);
-
+        if (d.getTypeEvenementId() != null) {
+            TypeEvenement typeEvenement = typeEvenementRepo
+                    .findById(d.getTypeEvenementId())
+                    .orElseThrow(() -> new RuntimeException("Type événement non trouvé"));
+            e.setTypeEvenement(typeEvenement);
+        }
         return e;
     }
 

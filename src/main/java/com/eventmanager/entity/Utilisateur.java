@@ -30,9 +30,11 @@ public class Utilisateur {
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable(name = "societe_prestataires",
+    @JoinTable(
+            name = "societe_prestataires",
             joinColumns = @JoinColumn(name = "societe_id"),
-            inverseJoinColumns  = @JoinColumn(name = "prestataire_id"))
+            inverseJoinColumns = @JoinColumn(name = "prestataire_id")
+    )
     private List<Utilisateur> prestataires = new ArrayList<>();
 
     @JsonIgnore
@@ -42,7 +44,10 @@ public class Utilisateur {
     @ManyToOne
     @JoinColumn(name = "societe_id")
     private Societe societe;
+
     @ManyToOne
     @JoinColumn(name = "prestataire_id")
     private Prestataire prestataire;
+
+
 }

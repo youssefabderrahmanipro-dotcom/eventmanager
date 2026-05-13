@@ -1,5 +1,8 @@
 package com.eventmanager.dto;
 
+import lombok.Data;
+
+@Data
 public class CategorieDTO {
 
     private Long id;
@@ -7,35 +10,9 @@ public class CategorieDTO {
     private String description;
     private Long proprietaireId;
 
-    public Long getId() {
-        return id;
-    }
+    // ✅ Ajouter ces deux champs
+    private Long typeEvenementId;
+    private String typeEvenementLibelle;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getProprietaireId() {
-        return proprietaireId;
-    }
-
-    public void setProprietaireId(Long proprietaireId) {
-        this.proprietaireId = proprietaireId;
-    }
 }

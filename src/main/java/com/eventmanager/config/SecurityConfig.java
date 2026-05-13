@@ -22,11 +22,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain chain(HttpSecurity http) throws Exception {
-        return http.csrf(c -> c.disable()).cors(c -> c.configure(http))
+        return http
+                .csrf(c -> c.disable())
+                .cors(c -> c.configure(http))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(a -> a.requestMatchers("/api/auth/**", "/h2-console/**").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(a -> a
+                        .requestMatchers("/api/auth/**", "/h2-console/**", "/api/type-evenements/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .headers(h -> h.frameOptions(f -> f.disable()))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

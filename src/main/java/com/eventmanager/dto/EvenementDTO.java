@@ -9,7 +9,9 @@ import java.util.List;
 public class EvenementDTO {
 
     private String id;
-
+    // ← remplacer String type
+    private Long typeEvenementId;
+    private String typeEvenementLibelle; // ← pour l'affichage côté front
     private String titre;
 
     private String type;
@@ -18,19 +20,13 @@ public class EvenementDTO {
 
     private String lieu;
 
-    private String description;
-
     private String proprietaireId;
 
     private String statut;
 
     private String nomClient;
     private String prenom;
-    private String email;
-    private String telephone;
-    private String adresse;
-    private String ville;
-    private String codePostale;
+
     private ClientType clientType;
 
 
