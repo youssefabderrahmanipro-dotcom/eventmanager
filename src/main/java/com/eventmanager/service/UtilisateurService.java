@@ -78,4 +78,15 @@ public class UtilisateurService {
                 .collect(Collectors.toList());
     }
 
+    public Utilisateur updateUtilisateur(String email, UpdateUtilisateurDTO dto) {
+        Utilisateur u = findByEmail(email);
+        if (dto.getNom() != null && !dto.getNom().isBlank())
+            u.setNom(dto.getNom());
+        if (dto.getEmail() != null && !dto.getEmail().isBlank())
+            u.setEmail(dto.getEmail());
+        if (dto.getTelephone() != null && !dto.getTelephone().isBlank())
+            u.setTelephone(dto.getTelephone());
+        return uRepo.save(u); // ← vérifiez que ce champ existe dans votre service
+    }
+
 }

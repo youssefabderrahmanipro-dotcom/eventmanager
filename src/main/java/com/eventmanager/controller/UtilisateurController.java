@@ -32,7 +32,22 @@ public class UtilisateurController {
                 )
         );
     }
-
+    @PatchMapping("/me")
+    public ResponseEntity<ReponseAuthentification> updateMe(
+            @RequestBody UpdateUtilisateurDTO dto,
+            Authentication a) {
+        Utilisateur updated = s.updateUtilisateur(a.getName(), dto);
+        return ResponseEntity.ok(
+                new ReponseAuthentification(
+                        null,
+                        String.valueOf(updated.getId()),
+                        updated.getNom(),
+                        updated.getEmail(),
+                        updated.getTelephone(),
+                        updated.getRole()
+                )
+        );
+    }
     @GetMapping("/stats")
     public ResponseEntity<StatistiquesDTO> stats(Authentication a) {
         return ResponseEntity.ok(s.getStats(a.getName()));

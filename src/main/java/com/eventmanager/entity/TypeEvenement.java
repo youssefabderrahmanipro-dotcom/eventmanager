@@ -20,7 +20,6 @@ public class TypeEvenement {
     @Column(nullable = false)
     private String libelle;
 
-    // ✅ Simple champ comme Categorie
     private Long proprietaireId;
 
     @JsonIgnore
@@ -28,7 +27,7 @@ public class TypeEvenement {
     private List<Evenement> evenements = new ArrayList<>();
 
 
-    @JsonIgnore // ✅ casser la référence circulaire
+    @JsonIgnore
     @OneToMany(mappedBy = "typeEvenement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Categorie> categories = new ArrayList<>();
 }
