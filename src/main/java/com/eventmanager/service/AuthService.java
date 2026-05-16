@@ -1,16 +1,24 @@
 package com.eventmanager.service;
 
 import com.eventmanager.dto.*;
+import com.eventmanager.entity.PasswordResetToken;
 import com.eventmanager.entity.Prestataire;
 import com.eventmanager.entity.Societe;
 import com.eventmanager.entity.Utilisateur;
+import com.eventmanager.repository.PasswordResetTokenRepository;
 import com.eventmanager.repository.PrestataireRepository;
 import com.eventmanager.repository.SocieteRepository;
 import com.eventmanager.repository.UtilisateurRepository;
 import com.eventmanager.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -23,6 +31,16 @@ public class AuthService {
 
     private final SocieteRepository societeRepo;
     private final PrestataireRepository prestataireRepo;
+
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
+    @Autowired
+    private EmailService emailService;
+    @Value("${app.reset-password.url}")
+    private String resetPasswordUrl;
+    @Value("${app.reset-password.expiration-minutes}")
+    private int expirationMinutes;
+
 
     public AuthService(UtilisateurRepository repo, PasswordEncoder enc, JwtUtil jwt, AuthenticationManager auth, MapperService mapper, SocieteRepository societeRepo, PrestataireRepository prestataireRepo) {
         this.repo = repo;
@@ -105,5 +123,23 @@ public class AuthService {
         }
 
         return mapper.toAuth(jwt.generate(u.getEmail()), u);
+    }
+
+    @Transactional
+    public void sendPasswordResetEmail(String email) {
+        // On vérifie si l'utilisateur existe
+        // Si non, on ne révèle rien (sécurité)
+        repo.findByEmail(email).ifPresent(user -> {
+            // Supprimer les anciens tokens
+            tokenRepository.deleteByEmail(email);
+            // Générer un token unique
+            String token = UUID.randomUUID().toString();
+            LocalDateTime expiry = LocalDateTime.now().plusMinutes(expirationMinutes);
+            // Sauvegarder le token
+            tokenRepository.save(new PasswordResetToken(token, email, expiry));
+            // Construire le lien et envoyer l'email
+            String resetLink = resetPasswordUrl + "?token=" + token;
+            emailService.sendPasswordResetEmail(email, resetLink);
+        });
     }
 }

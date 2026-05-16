@@ -86,7 +86,7 @@ public class UtilisateurService {
             u.setEmail(dto.getEmail());
         if (dto.getTelephone() != null && !dto.getTelephone().isBlank())
             u.setTelephone(dto.getTelephone());
-        return uRepo.save(u); // ← vérifiez que ce champ existe dans votre service
+        return uRepo .save(u); // ← vérifiez que ce champ existe dans votre service
     }
 
 }
