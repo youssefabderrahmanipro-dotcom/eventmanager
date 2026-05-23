@@ -43,31 +43,25 @@ public class PrestationService {
     }
 
     public PrestationDTO create(PrestationDTO dto, String email) {
-
         Utilisateur u = uRepo.findByEmail(email).orElseThrow();
-
         Categorie cat = categorieRepo.findById(dto.getCategorieId())
                 .orElseThrow(() -> new RuntimeException("Catégorie introuvable"));
-
         Prestation p = mapper.fromDto(dto, u, cat);
-
         return mapper.toDto(repo.save(p));
     }
+
     public PrestationDTO update(Long id, PrestationDTO dto) {
         Prestation p = repo.findById(id).orElseThrow();
-
         p.setNom(dto.getNom());
         p.setDescription(dto.getDescription());
         p.setPrix(dto.getPrix());
-
+        p.setImage(dto.getImage());  // ← AJOUT : mettre à jour l'image
         if (dto.getCategorieId() != null) {
             Categorie cat = categorieRepo.findById(dto.getCategorieId())
                     .orElseThrow(() -> new RuntimeException("Catégorie introuvable"));
             p.setCategorie(cat);
         }
-
         p.setStatut(dto.getStatut());
-
         return mapper.toDto(repo.save(p));
     }
 
@@ -77,18 +71,14 @@ public class PrestationService {
 
     public List<PrestationDTO> findByProvider(Long providerId, String emailDemandeur) {
         Utilisateur demandeur = uRepo.findByEmail(emailDemandeur).orElseThrow();
-
-        // Vérifier que le prestataire est bien dans les relations du demandeur
         boolean isRelated = demandeur.getPrestataires()
                 .stream()
                 .anyMatch(p -> p.getId().equals(providerId));
-
         if (!isRelated) {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.FORBIDDEN, "Accès refusé"
             );
         }
-
         return repo.findByProprietaireId(providerId)
                 .stream()
                 .map(mapper::toDto)

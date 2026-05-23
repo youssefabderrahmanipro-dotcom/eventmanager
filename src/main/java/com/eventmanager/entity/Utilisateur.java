@@ -28,6 +28,9 @@ public class Utilisateur {
 
     private String role;
 
+    @Column(nullable = false)
+    private boolean verified = false;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -49,5 +52,8 @@ public class Utilisateur {
     @JoinColumn(name = "prestataire_id")
     private Prestataire prestataire;
 
+
+    public boolean isVerified()              { return verified; }
+    public void    setVerified(boolean v)    { this.verified = v; }
 
 }

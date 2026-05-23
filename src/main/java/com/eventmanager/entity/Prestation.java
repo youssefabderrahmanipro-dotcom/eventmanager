@@ -19,6 +19,7 @@ public class Prestation {
     private String description;
     private Double prix;
     private String statut;
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")

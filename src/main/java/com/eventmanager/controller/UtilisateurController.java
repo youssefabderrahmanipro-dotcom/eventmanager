@@ -77,4 +77,10 @@ public class UtilisateurController {
     public ResponseEntity<List<PrestataireDTO>> getAllProviders() {
         return ResponseEntity.ok(s.getAllProviders());
     }
+
+    @GetMapping("/providers/{id}")
+    public ResponseEntity<PrestataireDTO> getProviderById(@PathVariable Long id) {
+        return ResponseEntity.ok(s.getProviderById(id));
+    }
+
 }

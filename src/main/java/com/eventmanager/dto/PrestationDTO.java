@@ -9,6 +9,7 @@ public class PrestationDTO {
     private String description;
     private double prix;
     private String statut;
+    private String image;
 
     private Long categorieId;
     private String categorieNom;

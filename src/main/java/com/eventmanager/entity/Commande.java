@@ -2,12 +2,45 @@ package com.eventmanager.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.time.LocalDate;
 import java.util.List;
+
 @Data
 @Entity
 @Table(name = "commandes")
 public class Commande {
+
+    // Enums internes
+    public enum PaymentMethod {
+        especes("Espèces"),
+        carte("Carte bancaire"),
+        virement("Virement bancaire"),
+        cheque("Chèque");
+
+        private String label;
+        PaymentMethod(String label) { this.label = label; }
+        public String getLabel() { return label; }
+    }
+
+    public enum PaymentType {
+        comptant("Comptant"),
+        echelonne("Échelonné"),
+        differe("Différé");
+
+        private String label;
+        PaymentType(String label) { this.label = label; }
+        public String getLabel() { return label; }
+    }
+
+    public enum PaymentStatus {
+        en_attente("En attente"),
+        partiel("Partiel"),
+        paye("Payé");
+
+        private String label;
+        PaymentStatus(String label) { this.label = label; }
+        public String getLabel() { return label; }
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +58,13 @@ public class Commande {
     private Utilisateur prestataire;
 
     @Column(columnDefinition = "TEXT")
-    private String prestataireIds; // ← stocker en JSON string ex: ["1","2"]
+    private String prestataireIds;
 
     @Column(columnDefinition = "TEXT")
-    private String pricingType; // ← stocker en JSON string ex: {"1":"forfait","2":"unite"}
+    private String pricingType;
 
     @Column(columnDefinition = "TEXT")
-    private String quantities;  // ← stocker en JSON string
+    private String quantities;
 
     @ManyToOne
     @JoinColumn(name = "evenement_id")
@@ -40,6 +73,10 @@ public class Commande {
     @ManyToOne
     @JoinColumn(name = "proprietaire_id")
     private Utilisateur proprietaire;
+
+    @ManyToOne
+    @JoinColumn(name = "package_partenaire_id")
+    private PackagePartenaire packagePartenaire;
 
     @ManyToMany
     @JoinTable(name = "commande_prestations",
@@ -58,4 +95,16 @@ public class Commande {
             joinColumns = @JoinColumn(name = "commande_id"),
             inverseJoinColumns = @JoinColumn(name = "sous_service_id"))
     private List<SousService> sousServices;
+
+    // Nouveaux champs pour le paiement
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
+
+    private LocalDate paymentDueDate;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }

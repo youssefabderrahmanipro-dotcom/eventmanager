@@ -11,10 +11,9 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 
-
 @Service
 public class MapperService {
-    private final TypeEvenementRepository typeEvenementRepo; // ← ajouter
+    private final TypeEvenementRepository typeEvenementRepo;
 
     public MapperService(TypeEvenementRepository typeEvenementRepo) {
         this.typeEvenementRepo = typeEvenementRepo;
@@ -56,12 +55,10 @@ public class MapperService {
 
     public Evenement fromDto(EvenementDTO d, Utilisateur proprietaire) {
         Evenement e = new Evenement();
-
         e.setTitre(d.getTitre());
         e.setDate(d.getDate());
         e.setLieu(d.getLieu());
         e.setStatut(d.getStatut() != null ? d.getStatut() : "à venir");
-
         e.setNomClient(d.getNomClient());
         e.setPrenom(d.getPrenom());
         e.setClientType(d.getClientType());
@@ -83,7 +80,7 @@ public class MapperService {
         d.setDescription(s.getDescription());
         d.setPrix(s.getPrix());
         d.setStatut(s.getStatut());
-        // ✅ catégorie propre
+        d.setImage(s.getImage());  // ← AJOUT : retourner l'image
         if (s.getCategorie() != null) {
             d.setCategorieId(s.getCategorie().getId());
             d.setCategorieNom(s.getCategorie().getName());
@@ -94,21 +91,17 @@ public class MapperService {
 
     public Prestation fromDto(PrestationDTO d, Utilisateur proprietaire, Categorie categorie) {
         Prestation s = new Prestation();
-
         s.setNom(d.getNom());
         s.setDescription(d.getDescription());
         s.setPrix(d.getPrix());
-
-        // ✅ relation correcte JPA
+        s.setImage(d.getImage());  // ← AJOUT : sauvegarder l'image à la création
         s.setCategorie(categorie);
-
         s.setStatut(d.getStatut() != null ? d.getStatut() : "actif");
         s.setProprietaire(proprietaire);
-
         return s;
     }
-    // --------------------- SOUS SERVICE ---------------------
 
+    // --------------------- SOUS SERVICE ---------------------
     public SousServiceDTO toDto(SousService s) {
         SousServiceDTO d = new SousServiceDTO();
         d.setId(String.valueOf(s.getId()));
@@ -168,6 +161,10 @@ public class MapperService {
         d.setPrixTotal(o.getPrixTotal());
         d.setNotes(o.getNotes());
         d.setDateCreation(o.getDateCreation());
+        d.setPaymentMethod(o.getPaymentMethod() != null ? o.getPaymentMethod().name() : null);
+        d.setPaymentType(o.getPaymentType() != null ? o.getPaymentType().name() : null);
+        d.setPaymentDueDate(o.getPaymentDueDate());
+        d.setPaymentStatus(o.getPaymentStatus() != null ? o.getPaymentStatus().name() : null);
         d.setProprietaireId(o.getProprietaire() != null ? String.valueOf(o.getProprietaire().getId()) : "");
         d.setEvenementId(o.getEvenement() != null ? String.valueOf(o.getEvenement().getId()) : null);
         d.setPrestationIds(
@@ -180,15 +177,11 @@ public class MapperService {
                         o.getPacks().stream().map(p -> String.valueOf(p.getId())).collect(Collectors.toList()) :
                         new ArrayList<>()
         );
-
-        // ← Retourner sousServiceIds
         d.setSousServiceIds(
                 o.getSousServices() != null ?
                         o.getSousServices().stream().map(ss -> ss.getId()).collect(Collectors.toList()) :
                         new ArrayList<>()
         );
-
-        // ← Retourner pricingType
         if (o.getPricingType() != null) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -219,7 +212,6 @@ public class MapperService {
                 d.setPrestataireIds(new ArrayList<>());
             }
         }
-
         return d;
     }
 
@@ -252,7 +244,6 @@ public class MapperService {
         d.setType("prestataire");
         d.setTelephone(u.getTelephone());
         d.setEmail(u.getEmail());
-        d.setMotDePasse(null);
         d.setProprietaireId(proprietaireId);
         return d;
     }

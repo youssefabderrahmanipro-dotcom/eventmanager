@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -24,14 +25,7 @@ public class CommandeService {
 
     private final CommandePrestationRepository commandePrestationRepository;
 
-    public CommandeService(
-            CommandeRepository r,
-            UtilisateurRepository u,
-            EvenementRepository e,
-            PrestationRepository p,
-            PackRepository packR,
-            MapperService m, SousServiceRepository sousServiceRepo, CommandePrestationRepository commandePrestationRepository
-    ) {
+    public CommandeService(CommandeRepository r, UtilisateurRepository u, EvenementRepository e, PrestationRepository p, PackRepository packR, MapperService m, SousServiceRepository sousServiceRepo, CommandePrestationRepository commandePrestationRepository) {
         repo = r;
         uRepo = u;
         eRepo = e;
@@ -44,10 +38,7 @@ public class CommandeService {
 
     public List<CommandeDTO> findAll(String email) {
         Utilisateur u = uRepo.findByEmail(email).orElseThrow();
-        return repo.findByProprietaireId(u.getId())
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+        return repo.findByProprietaireId(u.getId()).stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
     public CommandeDTO create(CommandeDTO dto, String email) {
@@ -60,50 +51,87 @@ public class CommandeService {
         o.setStatut(dto.getStatut() != null ? dto.getStatut() : "devis");
         o.setNotes(dto.getNotes());
         o.setDateCreation(LocalDate.now().toString());
+
+        if (dto.getPaymentMethod() != null) {
+            o.setPaymentMethod(Commande.PaymentMethod.valueOf(dto.getPaymentMethod()));
+        }
+        if (dto.getPaymentType() != null) {
+            o.setPaymentType(Commande.PaymentType.valueOf(dto.getPaymentType()));
+        }
+        if (dto.getPaymentDueDate() != null) {
+            o.setPaymentDueDate(dto.getPaymentDueDate());
+        }
+        if (dto.getPaymentStatus() != null) {
+            o.setPaymentStatus(Commande.PaymentStatus.valueOf(dto.getPaymentStatus()));
+        }
         o.setProprietaire(u);
 
         if (dto.getEvenementId() != null && !dto.getEvenementId().isEmpty()) {
-            o.setEvenement(
-                    eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null)
-            );
+            o.setEvenement(eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null));
         }
 
         if (dto.getPrestationIds() != null && !dto.getPrestationIds().isEmpty()) {
-            List<Prestation> prestations = prestationRepo.findAllById(
-                    dto.getPrestationIds().stream()
-                            .map(Long::valueOf)
-                            .collect(Collectors.toList())
-            );
+            List<Prestation> prestations = prestationRepo.findAllById(dto.getPrestationIds().stream().map(Long::valueOf).collect(Collectors.toList()));
             o.setPrestations(prestations);
         }
 
         if (dto.getPackIds() != null && !dto.getPackIds().isEmpty()) {
-            List<Pack> packs = packRepo.findAllById(
-                    dto.getPackIds().stream()
-                            .map(Long::valueOf)
-                            .collect(Collectors.toList())
-            );
+            List<Pack> packs = packRepo.findAllById(dto.getPackIds().stream().map(Long::valueOf).collect(Collectors.toList()));
             o.setPacks(packs);
         }
 
         double total = 0;
 
         if (o.getPrestations() != null) {
-            total += o.getPrestations()
-                    .stream()
-                    .mapToDouble(Prestation::getPrix)
-                    .sum();
+            total += o.getPrestations().stream().mapToDouble(Prestation::getPrix).sum();
         }
 
         if (o.getPacks() != null) {
-            total += o.getPacks()
-                    .stream()
-                    .mapToDouble(Pack::getPrix)
-                    .sum();
+            total += o.getPacks().stream().mapToDouble(Pack::getPrix).sum();
         }
 
         o.setPrixTotal(total);
 
+        // ← Sauvegarder sousServices
+        if (dto.getSousServiceIds() != null) {
+            List<SousService> sousServices = sousServiceRepo.findAllById(dto.getSousServiceIds());
+            o.setSousServices(sousServices);
+        }
+
+// ← Sauvegarder quantities en JSON
+        if (dto.getQuantities() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                o.setQuantities(objectMapper.writeValueAsString(dto.getQuantities()));
+            } catch (Exception e) {
+                o.setQuantities(null);
+            }
+        }
+
+// ← Sauvegarder pricingType en JSON
+        if (dto.getPricingType() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                o.setPricingType(objectMapper.writeValueAsString(dto.getPricingType()));
+            } catch (Exception e) {
+                o.setPricingType(null);
+            }
+        }
+
+// ← Sauvegarder prestataireIds en JSON
+        if (dto.getPrestataireIds() != null && !dto.getPrestataireIds().isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                o.setPrestataireIds(objectMapper.writeValueAsString(dto.getPrestataireIds()));
+            } catch (Exception e) {
+                o.setPrestataireIds(null);
+            }
+        }
+
+// ← Utiliser prixTotal du frontend au lieu du recalcul
+        if (dto.getPrixTotal() != null && dto.getPrixTotal() > 0) {
+            o.setPrixTotal(dto.getPrixTotal());
+        }
         return mapper.toDto(repo.save(o));
     }
 
@@ -115,16 +143,26 @@ public class CommandeService {
         o.setStatut(dto.getStatut());
         o.setNotes(dto.getNotes());
 
+        if (dto.getPaymentMethod() != null) {
+            o.setPaymentMethod(Commande.PaymentMethod.valueOf(dto.getPaymentMethod()));
+        }
+        if (dto.getPaymentType() != null) {
+            o.setPaymentType(Commande.PaymentType.valueOf(dto.getPaymentType()));
+        }
+        if (dto.getPaymentDueDate() != null) {
+            o.setPaymentDueDate(dto.getPaymentDueDate());
+        }
+        if (dto.getPaymentStatus() != null) {
+            o.setPaymentStatus(Commande.PaymentStatus.valueOf(dto.getPaymentStatus()));
+        }
+
+
         if (dto.getEvenementId() != null && !dto.getEvenementId().isEmpty()) {
             o.setEvenement(eRepo.findById(Long.valueOf(dto.getEvenementId())).orElse(null));
         }
 
         if (dto.getPrestationIds() != null) {
-            List<Prestation> prestations = prestationRepo.findAllById(
-                    dto.getPrestationIds().stream()
-                            .map(Long::valueOf)
-                            .collect(Collectors.toList())
-            );
+            List<Prestation> prestations = prestationRepo.findAllById(dto.getPrestationIds().stream().map(Long::valueOf).collect(Collectors.toList()));
             o.setPrestations(prestations);
 
             if (dto.getPrestationsWithQuantite() != null && !dto.getPrestationsWithQuantite().isEmpty()) {
@@ -148,11 +186,7 @@ public class CommandeService {
         }
 
         if (dto.getPackIds() != null) {
-            List<Pack> packs = packRepo.findAllById(
-                    dto.getPackIds().stream()
-                            .map(Long::valueOf)
-                            .collect(Collectors.toList())
-            );
+            List<Pack> packs = packRepo.findAllById(dto.getPackIds().stream().map(Long::valueOf).collect(Collectors.toList()));
             o.setPacks(packs);
         }
 

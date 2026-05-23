@@ -44,4 +44,21 @@ public class SousServiceService {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    // Dans SousServiceService.java
+    public SousServiceDTO update(Long id, SousServiceDTO dto) {
+        SousService existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sous-service non trouvé avec id : " + id));
+
+        // Mise à jour des champs autorisés
+        existing.setNom(dto.getNom());
+        existing.setDescription(dto.getDescription());
+        existing.setPrix(dto.getPrix());
+        // Ne pas modifier la prestation parente (prestationId) – ou si vous voulez l'autoriser :
+        // existing.setPrestation(prestationRepository.findById(Long.parseLong(dto.getPrestationId())).orElseThrow(...));
+
+        SousService updated = repository.save(existing);
+        return mapper.toDto(updated);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.eventmanager.service;
 
 import com.eventmanager.dto.*;
+import com.eventmanager.entity.Prestataire;
 import com.eventmanager.entity.Utilisateur;
 import com.eventmanager.repository.*;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,15 @@ public class UtilisateurService {
     private final PrestationRepository sRepo;
     private final CommandeRepository oRepo;
     private final MapperService mapper;
+    private final PrestataireRepository prestataireRepository;
 
-    public UtilisateurService(UtilisateurRepository u, EvenementRepository e, PrestationRepository s, CommandeRepository o, MapperService m) {
+    public UtilisateurService(UtilisateurRepository u, EvenementRepository e, PrestationRepository s, CommandeRepository o, MapperService m, PrestataireRepository prestataireRepository) {
         uRepo = u;
         eRepo = e;
         sRepo = s;
         oRepo = o;
         mapper = m;
+        this.prestataireRepository = prestataireRepository;
     }
 
     public Utilisateur findByEmail(String email) {
@@ -89,4 +92,9 @@ public class UtilisateurService {
         return uRepo .save(u); // ← vérifiez que ce champ existe dans votre service
     }
 
+    public PrestataireDTO getProviderById(Long id) {
+        Utilisateur u = uRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Prestataire introuvable"));
+        return mapper.toPrestataire(u, null);
+    }
 }
